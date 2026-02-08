@@ -1,0 +1,9 @@
+tables:
+  orders:
+    columns:
+    - order_id
+    - user_id
+    - total_amount
+    - source_id
+    - status
+    - timestamp

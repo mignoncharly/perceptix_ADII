@@ -1,0 +1,44 @@
+# Core Dependencies
+pydantic>=2.0.0,<3.0.0
+python-dotenv>=1.0.0,<2.0.0
+
+# Google Gemini AI
+google-genai
+google-auth>=2.47.0,<3.0.0
+
+
+# Logging and Observability
+structlog>=24.0.0,<25.0.0
+
+# Testing (for future phases)
+pytest>=7.4.0,<8.0.0
+pytest-cov>=4.1.0,<5.0.0
+pytest-mock>=3.12.0,<4.0.0
+
+# Web Framework (Phase 5)
+fastapi>=0.104.0,<1.0.0
+uvicorn[standard]>=0.24.0,<1.0.0
+
+# HTTP Client
+requests>=2.31.0,<3.0.0
+
+# Data Warehouse Connectors (Phase 6) - Optional
+snowflake-connector-python>=3.0.0,<4.0.0  # For Snowflake
+google-cloud-bigquery>=3.10.0,<4.0.0      # For BigQuery
+psycopg2-binary>=2.9.0,<3.0.0             # For Redshift
+
+# Utilities
+colorama>=0.4.6,<1.0.0
+tqdm>=4.67.0,<5.0.0
+GitPython>=3.1.0
+aiosqlite>=0.19.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+rich>=13.0.0
+pytest>=7.0.0
+httpx>=0.23.0
+pytest-asyncio>=0.23.0
+
+
+sdnotify==0.3.2

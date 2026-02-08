@@ -1,0 +1,41 @@
+# Schema Change Detection Rule
+# Triggers when null rate suddenly increases (indicating possible schema change)
+
+id: schema_change_detector
+name: Schema Change Detector
+description: Detect sudden increases in null rates that might indicate schema changes
+enabled: true
+priority: high
+
+conditions:
+  any:
+    - field: table_metrics.orders_table.null_rates.attribution_source
+      operator: greater_than
+      value: 0.80
+    - field: table_metrics.orders_table.null_rates.user_id
+      operator: greater_than
+      value: 0.50
+
+actions:
+  - type: alert
+    params:
+      channels: ["slack"]
+      level: "CRITICAL"
+      message: "Potential schema change detected - High null rates in {table_name}"
+
+  - type: auto_investigate
+    params:
+      hypothesis_priority: "high"
+
+  - type: create_ticket
+    params:
+      system: "jira"
+      title: "Potential Schema Change: {table_name}"
+      description: "Automatic alert from Cognizant - investigate schema changes"
+
+cooldown_minutes: 120
+max_triggers_per_day: 5
+tags: ["schema", "data_quality", "critical"]
+metadata:
+  owner: "data-engineering-team"
+  requires_investigation: true

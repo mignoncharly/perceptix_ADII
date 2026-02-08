@@ -1,0 +1,36 @@
+# Data Freshness SLA Alert Rule
+# Triggers when data freshness exceeds SLA threshold
+
+id: data_freshness_sla
+name: Data Freshness SLA Violation
+description: Alert when data freshness exceeds 15 minutes for critical tables
+enabled: true
+priority: medium
+
+conditions:
+  any:
+    - field: table_metrics.orders_table.freshness_minutes
+      operator: greater_than
+      value: 15
+    - field: table_metrics.users_table.freshness_minutes
+      operator: greater_than
+      value: 30
+
+actions:
+  - type: alert
+    params:
+      channels: ["slack"]
+      level: "WARNING"
+      message: "Data freshness SLA violated: {table_name}"
+
+  - type: log
+    params:
+      message: "Rule {rule_id} triggered - Data freshness exceeds SLA"
+      level: "WARNING"
+
+cooldown_minutes: 45
+max_triggers_per_day: 15
+tags: ["data_freshness", "sla"]
+metadata:
+  owner: "data-ops-team"
+  sla_threshold_minutes: 15

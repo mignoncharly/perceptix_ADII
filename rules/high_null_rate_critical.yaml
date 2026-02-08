@@ -1,0 +1,37 @@
+# Critical Null Rate Alert Rule
+# Triggers when null rate exceeds 50% for important columns
+
+id: high_null_rate_critical
+name: Critical Null Rate Alert
+description: Alert when null rate exceeds 50% for important columns like attribution_source
+enabled: true
+priority: critical
+
+conditions:
+  all:
+    - field: orders_table_attribution_source_null_rate
+      operator: greater_than
+      value: 0.5
+
+actions:
+  - type: alert
+    params:
+      channels: ["slack", "email"]
+      level: "CRITICAL"
+      message: "Critical null rate detected: {rule_table}.{rule_column} null_rate={rule_value} (threshold={rule_threshold})"
+
+  - type: auto_investigate
+    params:
+      hypothesis_priority: "high"
+
+  - type: log
+    params:
+      message: "Rule {rule_id} triggered - High null rate in attribution_source"
+      level: "ERROR"
+
+cooldown_minutes: 30
+max_triggers_per_day: 20
+tags: ["data_quality", "critical", "orders"]
+metadata:
+  owner: "data-ops-team"
+  created_by: "cognizant-setup"

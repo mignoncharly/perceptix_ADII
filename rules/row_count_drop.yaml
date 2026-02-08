@@ -1,0 +1,33 @@
+# Row Count Drop Alert Rule
+# Triggers when row count drops significantly from baseline
+
+id: row_count_drop
+name: Significant Row Count Drop
+description: Alert when table row count drops by more than 20% from 7-day baseline
+enabled: true
+priority: high
+
+conditions:
+  all:
+    - field: table_metrics.orders_table.row_count
+      operator: less_than
+      value: 12000  # 80% of baseline 15000
+
+actions:
+  - type: alert
+    params:
+      channels: ["slack"]
+      level: "WARNING"
+      message: "Row count drop detected in orders_table: {table_metrics}"
+
+  - type: log
+    params:
+      message: "Rule {rule_id} triggered - Row count below threshold"
+      level: "WARNING"
+
+cooldown_minutes: 60
+max_triggers_per_day: 10
+tags: ["data_completeness", "orders"]
+metadata:
+  owner: "data-ops-team"
+  baseline_rows: 15000

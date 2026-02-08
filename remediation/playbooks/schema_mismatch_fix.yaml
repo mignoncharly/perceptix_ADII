@@ -1,0 +1,44 @@
+# Schema Change Response Playbook
+# Designed to be safe and "always runnable" in a hackathon/prod demo environment:
+# - No git/PR dependencies
+# - No reliance on repo-local ETL config files
+# - Uses notifications when configured; otherwise actions are skipped cleanly
+
+name: Fix Schema Mismatch
+description: Respond to schema change incidents by notifying operators with context and recommended actions
+
+triggers:
+  - incident_type: SCHEMA_CHANGE
+    confidence_threshold: 0
+
+steps:
+  - name: Log remediation start
+    action: log_message
+    params:
+      message: "Schema change detected (incident {{incident_id}}). Operator action may be required."
+      level: warning
+
+  - name: Notify Slack (if configured)
+    action: send_slack_message
+    params:
+      channel: "#data-ops"
+      message: |
+        Perceptix detected a schema change incident.
+        Incident: {{incident_id}}
+        Type: {{incident_type}}
+        Confidence: {{confidence}}%
+        Timestamp: {{timestamp}}
+
+  - name: Notify Email (if configured)
+    action: send_email
+    params:
+      subject: "Perceptix Alert: Schema Change ({{incident_id}})"
+      body: |
+        Perceptix detected a schema change incident.
+
+        Incident: {{incident_id}}
+        Type: {{incident_type}}
+        Confidence: {{confidence}}%
+        Timestamp: {{timestamp}}
+
+        Please review downstream pipeline compatibility and apply a schema migration if needed.

@@ -1,0 +1,84 @@
+[Unit]
+Description=Perceptix API Service (FastAPI + Gunicorn + Uvicorn)
+Documentation=https://github.com/YOUR_USERNAME/YOUR_REPO
+After=network.target network-online.target
+Wants=network-online.target
+# If using PostgreSQL, uncomment:
+# After=postgresql.service
+# Wants=postgresql.service
+
+[Service]
+Type=notify
+
+# User and group
+User=mignon
+Group=mignon
+
+# Working directory
+WorkingDirectory=/home/mignon/gemini
+
+# Environment variables
+Environment="PATH=/home/mignon/gemini/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
+Environment="PYTHONPATH=/home/mignon/gemini"
+Environment="PYTHONUNBUFFERED=1"
+
+# Load environment variables from .env file
+EnvironmentFile=/home/mignon/gemini/.env
+
+# Start command
+ExecStart=/home/mignon/gemini/.venv/bin/gunicorn \
+    --config /home/mignon/gemini/gunicorn_config.py \
+    --log-level info \
+    api:app
+
+
+# Runtime directory for PID file
+RuntimeDirectory=gemini
+
+# Graceful reload on configuration change
+ExecReload=/bin/kill -s HUP $MAINPID
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=0
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Memory limit (adjust based on your VPS resources)
+MemoryLimit=2G
+
+# CPU quota (200% = 2 cores max)
+CPUQuota=200%
+
+# Logging
+StandardOutput=append:/var/log/gemini/stdout.log
+StandardError=append:/var/log/gemini/stderr.log
+SyslogIdentifier=perceptix-api
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Filesystem protection
+ProtectSystem=full
+ProtectHome=false
+ReadWritePaths=/home/mignon/gemini/data /home/mignon/gemini/models_saved /var/log/gemini /var/run/gemini
+
+# Additional security options (may need adjustment based on your needs)
+# ProtectKernelTunables=true
+# ProtectKernelModules=true
+# ProtectControlGroups=true
+# RestrictRealtime=true
+# RestrictNamespaces=true
+
+# Kill all processes in the service's cgroup on stop
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,43 @@
+# Test Playbook - Simple playbook for testing remediation system
+
+name: Test Remediation Playbook
+description: Simple test playbook that logs messages and backs up a file
+
+triggers:
+  - incident_type: TEST_INCIDENT
+    confidence_threshold: 0
+
+conditions:
+  - check: always_true
+
+steps:
+  - name: Log start message
+    action: log_message
+    params:
+      message: "Starting test remediation for incident {{incident_id}}"
+      level: info
+
+  - name: Backup configuration file
+    action: backup_file
+    params:
+      file: "config.yaml"
+      destination: "backups/"
+
+  - name: Send notification
+    action: send_slack_message
+    params:
+      channel: "#test-channel"
+      message: "Test remediation completed for incident {{incident_id}}"
+
+  - name: Log completion
+    action: log_message
+    params:
+      message: "Test remediation completed successfully"
+      level: info
+
+rollback:
+  - name: Log rollback
+    action: log_message
+    params:
+      message: "Rolling back test remediation"
+      level: warning

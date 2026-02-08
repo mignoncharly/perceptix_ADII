@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  perceptix-api:
+    build: .
+    image: perceptix-api:latest
+    container_name: perceptix_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - PERCEPTIX_MODE=PRODUCTION
+      - SYSTEM_LOG_LEVEL=INFO
+      - API_JWT_SECRET_KEY=${API_JWT_SECRET_KEY:-insecure_default_secret}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - perceptix-network
+
+networks:
+  perceptix-network:
+    driver: bridge

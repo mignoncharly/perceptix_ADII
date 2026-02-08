@@ -1,0 +1,36 @@
+# Baseline Deviation Rule
+# Triggers when metrics deviate significantly from historical baseline
+
+id: baseline_deviation
+name: Historical Baseline Deviation
+description: Alert when current metrics deviate significantly from 7-day baseline
+enabled: true
+priority: medium
+
+conditions:
+  any:
+    - field: table_metrics.orders_table.row_count
+      operator: less_than
+      value: 13500  # 90% of baseline
+    - field: table_metrics.orders_table.row_count
+      operator: greater_than
+      value: 16500  # 110% of baseline
+
+actions:
+  - type: alert
+    params:
+      channels: ["slack"]
+      level: "INFO"
+      message: "Metric deviation from baseline detected in {table_name}"
+
+  - type: log
+    params:
+      message: "Rule {rule_id} triggered - Baseline deviation"
+      level: "INFO"
+
+cooldown_minutes: 90
+max_triggers_per_day: 8
+tags: ["baseline", "monitoring"]
+metadata:
+  owner: "data-ops-team"
+  baseline_range: "90-110%"
