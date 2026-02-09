@@ -16,6 +16,7 @@ import {
     Update,
 } from '@mui/icons-material';
 import { format } from 'date-fns';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ActivityEvent {
     type: string;
@@ -26,6 +27,7 @@ interface ActivityEvent {
 const AgentActivityFeed: React.FC = () => {
     const [events, setEvents] = useState<ActivityEvent[]>([]);
     const ws = useRef<WebSocket | null>(null);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -47,6 +49,16 @@ const AgentActivityFeed: React.FC = () => {
         ws.current.onmessage = (event) => {
             try {
                 const message = JSON.parse(event.data);
+                // When a cycle completes (or an incident is detected), refresh dashboard data immediately.
+                // This avoids requiring a hard page refresh during recordings.
+                const msgType = String(message?.type || '');
+                if (['incident_detected', 'cycle_completed', 'cycle_error'].includes(msgType)) {
+                    queryClient.invalidateQueries({ queryKey: ['incidents'] });
+                    queryClient.invalidateQueries({ queryKey: ['metrics'] });
+                    queryClient.invalidateQueries({ queryKey: ['dashboardSummary'] });
+                    queryClient.invalidateQueries({ queryKey: ['dashboardTrends'] });
+                    queryClient.invalidateQueries({ queryKey: ['cycleStatus'] });
+                }
                 setEvents((prev) => [
                     {
                         type: message.type,

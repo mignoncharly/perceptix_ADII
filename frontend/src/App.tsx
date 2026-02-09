@@ -13,7 +13,9 @@ import AdminDashboard from './components/AdminDashboard';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
+      // Users often open the Gemini proof/docs in a new tab during the demo.
+      // Refetching on focus prevents "refresh the page to see the new incident" moments.
+      refetchOnWindowFocus: true,
       retry: 1,
       staleTime: 5000,
     },
