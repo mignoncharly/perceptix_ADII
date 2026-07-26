@@ -1,83 +1,86 @@
-# Project Cognizant (Perceptix) 🧠🚀
+# Perceptix
 
-**The Autonomous Data Reliability Engine.**
+Perceptix is a data-reliability project built for the Gemini API Hackathon. It explores a simple idea: when a data-quality alert fires, the useful question is not only **what failed?** but also **what changed, what is affected, and what evidence supports the diagnosis?**
 
-Perceptix is an agentic AI system designed to detect, diagnose, and remediate data quality issues in real-time. By leveraging advanced causal reasoning capabilities from **Google Gemini**, it bridges the gap between raw metrics and actionable business impact.
+The system combines deterministic rules, anomaly detection and a tool-using investigation loop. Gemini helps connect evidence from schemas, service-level rules, incidents and repository history; it does not replace the underlying checks.
 
-[![Technical Architecture](https://img.shields.io/badge/Architecture-Mermaid-blue)](./ARCHITECTURE.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## How it works
 
-## 🌟 Why Gemini?
+The investigation flow follows five steps:
 
-In complex data environments, a simple "if-this-then-that" logic isn't enough. We use Google Gemini as the cognitive core of Project Cognizant for:
+1. **Observe** a rule violation or anomaly.
+2. **Reason** about likely causes and business impact.
+3. **Investigate** by calling the available evidence tools.
+4. **Verify** the explanation against collected facts.
+5. **Act** by proposing a remediation for review.
 
-1.  **Massive Context Window**: We feed Gemini entire table schemas, SLA definitions, and recent Git commit histories. It correlates these diverse data points to find the technical "needle in the haystack."
-2.  **Causal Reasoning Stability**: Unlike standard LLMs, Gemini reasoning models excel at structured step-by-step reasoning, ensuring that investigations are technical and evidence-based, not just probabilistic guesses.
-3.  **Tool-Use Native**: The model natively understands how to interact with our internal "Investigator" tools to gather evidence before reaching a conclusion.
+The React dashboard gives operators a place to inspect system health and approve remediation actions. Automatic suggestions are treated as proposals, not as unquestionable truth.
 
-## 🔥 Key Features
+## Main components
 
--   **Autonomous Agent Loop**: Observe → Reason → Investigate → Verify → Act.
--   **Smart ML Triggers**: Hybrid approach using Isolation Forests and Autoencoders to trigger investigations.
--   **Self-Healing Remediation**: Proactively suggests and executes fixes (e.g., field renaming rollbacks).
--   **Meta-Learning**: Periodic analysis of incident patterns to identify systemic weaknesses.
--   **Enterprise Ready**: Multi-tenancy, RBAC, and production-hardened deployment.
+- Rule-based quality checks
+- Isolation Forest and autoencoder triggers
+- Gemini-backed investigation workflow
+- Remediation proposals and approval handling
+- Multi-tenant access control
+- Incident history and recurring-pattern analysis
+- REST API, CLI and React dashboard
+- Tests, load checks and deployment assets
 
-## 🏗️ Getting Started
+## Repository guide
 
-### Prerequisites
+| Path | Purpose |
+| --- | --- |
+| `perceptix` | Core application logic |
+| `rules` / `rules_engine` | Deterministic quality rules |
+| `ml` | Anomaly-detection components |
+| `remediation` | Proposed and approved corrective actions |
+| `frontend` | Monitoring and approval interface |
+| `tenancy` / `security` | Tenant boundaries and access control |
+| `tests` / `load_tests` | Functional and performance checks |
+| `deploy` | Deployment configuration |
+
+The deeper design notes are in [`ARCHITECTURE.md`](./ARCHITECTURE.md). Hackathon context and verification steps are documented in [`HACKATHON_SUBMISSION.md`](./HACKATHON_SUBMISSION.md).
+
+## Local setup
+
+Requirements:
+
 - Python 3.9+
-- Gemini API Key
-- Optional: `GEMINI_MODEL_NAME` (defaults to `models/gemini-3-pro-preview`; set explicitly if you want a different Gemini model)
+- A Gemini API key
+- Node.js for the dashboard
 
-### Installation
+```bash
+git clone https://github.com/mignoncharly/perceptix_ADII.git
+cd perceptix_ADII
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/user/project-cognizant.git
-   cd project-cognizant
-   ```
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+cp .env.example .env
+```
 
-3. Setup environment:
-   ```bash
-   cp .env.example .env
-   # Add your GEMINI_API_KEY
-   # Optionally set GEMINI_MODEL_NAME (defaults to models/gemini-3-pro-preview)
-   # Optionally customize DEMO_USERNAME / DEMO_PASSWORD
-   ```
+Add `GEMINI_API_KEY` to `.env`. `GEMINI_MODEL_NAME` is optional.
 
-4. Run the API:
-   ```bash
-   python api.py
-   ```
+Start the API:
 
-## 📊 Dashboard
+```bash
+python api.py
+```
 
-Access the React-based dashboard at `http://localhost:3000` to monitor system health and approve remediation actions.
+The dashboard runs separately from `frontend/`. The API also exposes a runtime-proof endpoint:
 
-## 📜 Documentation
+```text
+GET /api/v1/hackathon/gemini-proof
+```
 
--   [Technical Architecture](./ARCHITECTURE.md)
--   [Hackathon Submission Packet](./HACKATHON_SUBMISSION.md)
--   [Deployment Guide](./deploy/README.md)
--   [API Reference](http://localhost:8000/docs)
+## Preflight
 
-## 🧪 Hackathon Preflight
-
-Run the full readiness check:
+Run the project checks before a demo or deployment:
 
 ```bash
 ./scripts/hackathon_preflight.sh
 ```
 
-Gemini runtime proof endpoint:
-
-- `GET /api/v1/hackathon/gemini-proof`
-
----
-*Created for the Gemini API Hackathon.*
+Perceptix is an engineering experiment, not a promise that every data incident can be solved by a language model. Its value is in bringing evidence, repeatable checks and human approval into the same investigation.
